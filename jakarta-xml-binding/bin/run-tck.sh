@@ -27,6 +27,7 @@ fail() {
 addToClassPath() {
     if [ -d "${1}" ]; then
         TCK_CLASS_PATH="${TCK_CLASS_PATH}$(find "${1}" -name "*.jar" | tr '\n' : )"
+        JAXB_CLASSES="${JAXB_CLASSES}$(find "${1}" -name "*.jar" | tr '\n' ' ')"
     else
         echo "Directory ${1} does not exist."
     fi
@@ -86,6 +87,7 @@ if [ ${verbose} == true ]; then
     verboseArgs="-v"
 fi
 
+export JAVA_HOME=/usr/lib/jvm/java
 # Set the default directory for the base TCK home
 if [ -z "${WORK_DIR}" ]; then
     WORK_DIR="/tmp/jakarta-xml-bind"
@@ -200,7 +202,7 @@ jck.env.jaxb.xsd_compiler.defaultOperationMode=Yes
 jck.env.jaxb.xsd_compiler.run.compilerWrapperClass=com.sun.jaxb_tck.lib.SchemaCompiler
 jck.env.jaxb.xsd_compiler.skipValidationOptional=Yes
 jck.env.testPlatform.local=Yes
-jck.env.testPlatform.multiJVM=No
+jck.env.testPlatform.multiJVM=Yes
 jck.excludeList.customFiles=${TCK_HOME}/lib/jaxb_tck40.jtx
 jck.excludeList.excludeListType=custom
 jck.excludeList.latestAutoCheck=No
@@ -213,6 +215,10 @@ jck.priorStatus.status=
 ${TEST_INFO}
 jck.tests.treeOrFile=tree
 jck.timeout.timeout=2
+jck.env.jaxb.classes.needJaxbClasses=Yes
+jck.env.jaxb.classes.jaxbClasses=${JAXB_CLASSES}
+jck.env.jaxb.xsd_compiler.testCompile.xjcCmd=/bin/bash ${TCK_HOME}/linux/bin/xjc.sh
+jck.env.jaxb.schemagen.run.jxcCmd=/bin/bash ${TCK_HOME}/linux/bin/schemagen.sh
 
 " > "${TCK_HOME}"/default_configuration.jti
 
